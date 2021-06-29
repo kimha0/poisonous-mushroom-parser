@@ -1,0 +1,26 @@
+{
+  "name": "maple-parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "ts-node index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.1",
+    "node-html-parser": "^3.3.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/node-fetch": "^2.5.10",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.4"
+  },
+  "type": "commonjs"
+}
