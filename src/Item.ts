@@ -1,4 +1,5 @@
 import type { HTMLElement } from 'node-html-parser'
+import { replaceName } from './modules/utils'
 
 type Option = {
   name: string
@@ -11,6 +12,12 @@ type Rate = {
   rate: number
 }
 
+export type ItemReturnType = {
+  option: Option
+  firstOptions: Rate[]
+  secondOptions: Rate[]
+  thirdOptions: Rate[]
+}
 export default class Item {
   private option!: Option
   private firstOptions!: Rate[]
@@ -61,17 +68,17 @@ export default class Item {
 
     tbodyTableRows.forEach((rows) => {
       const tbodyList = rows.querySelectorAll('td')
-      const firstName = tbodyList[0].text
+      const firstName = replaceName(tbodyList[0].text)
       const firstValue = tbodyList[1].text
 
       const first = this.getRate(firstName, firstValue)
 
-      const secondName = tbodyList[2].text
+      const secondName = replaceName(tbodyList[2].text)
       const secondValue = tbodyList[3].text
 
       const second = this.getRate(secondName, secondValue)
 
-      const thirdName = tbodyList[4].text
+      const thirdName = replaceName(tbodyList[4].text)
       const thirdValue = tbodyList[5].text
 
       const third = this.getRate(thirdName, thirdValue)
@@ -111,12 +118,7 @@ export default class Item {
 
 
 
-  get(): {
-    option: Option
-    firstOptions: Rate[]
-    secondOptions: Rate[]
-    thirdOptions: Rate[]
-  } {
+  get(): ItemReturnType {
     return {
       option: this.option,
       firstOptions: this.firstOptions,
