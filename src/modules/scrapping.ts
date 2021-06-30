@@ -1,6 +1,8 @@
 import { scraping, saveScraping } from "./utils"
-import config from "../config/config"
+import { parse } from 'node-html-parser'
+import config from "../../config/dev.config"
 import fs from 'fs'
+import OptionRate from "../OptionRate"
 
 export default async function getScrapping(): Promise<void> {
   const texts = await Promise.all(config.scrapingUrls.map(({ url }) => scraping(url)))
@@ -22,3 +24,4 @@ export default async function getScrapping(): Promise<void> {
     saveScraping(`.bin/${paths[text]}`, texts[text])
   }
 }
+
