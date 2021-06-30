@@ -2,16 +2,34 @@ import type { HTMLElement } from 'node-html-parser'
 
 export default class Rank {
 
-  rank: {
+  private rank: {
     prev: string
     next: string
     rate: number
   }[] = []
 
-  constructor(html: HTMLElement) {
-    const body = html.querySelectorAll('tbody > tr')
+  private html!: HTMLElement
+  private trList!: HTMLElement[]
 
-    for(const tr of body) {
+
+  constructor(html: HTMLElement) {
+    this.html = html
+
+    this.setTableRowList()
+    this.setRank()
+  }
+
+  get() {
+    return this.rank
+  }
+
+
+  private setTableRowList() {
+    this.trList = this.html.querySelectorAll('tbody > tr')
+  }
+
+  private setRank() {
+    for(const tr of this.trList) {
 
       const first = tr.querySelector('td:nth-child(1)')
       const second = tr.querySelector('td:nth-child(2)')
@@ -31,12 +49,6 @@ export default class Rank {
         rate,
       })
     }
-  }
-
-
-
-  get() {
-    return this.rank
   }
 
 }
