@@ -1,7 +1,7 @@
 import type c from "../config/config"
 import readline from 'readline'
 import getScrapping from "./modules/scrapping"
-import { hasHTMLFiles, mkdir, parseElement, parseElements, readText, saveScraping } from "./modules/utils"
+import { hasHTMLFiles, mkdir, parseElement, parseElements, readText, saveFile } from "./modules/utils"
 import Rank from "./Rank"
 import OptionRate from "./OptionRate"
 import Item, { ItemReturnType } from "./Item"
@@ -18,9 +18,8 @@ const rl = readline.createInterface({
 async function main() {
   // 1. set html
   await settingHTML()
-
-  // 2. set JSON
   settingJSON()
+  // 2. set JSON
 }
 
 async function settingHTML() {
@@ -50,13 +49,11 @@ async function ask(question: string): Promise<string> {
   })
 }
 
-async function settingJSON() {
+function settingJSON() {
   const config = require('../config/config').default as Config
   const path = '.bin/json'
 
   mkdir(path)
-
-  const pad = config.scrapingUrls.reduce((accu, curr) => accu > curr.name.length ? accu : curr.name.length, 0) + (path.length + 9)
 
   config.scrapingUrls.forEach(scrapingUrl => {
     const txt = readText(`.bin/${scrapingUrl.name}.html`)
@@ -80,14 +77,12 @@ async function settingJSON() {
       items.push(item)
     })
 
-    saveScraping(`${path}/${scrapingUrl.name}.json`, JSON.stringify({
+    saveFile(`${path}/${scrapingUrl.name}.json`, JSON.stringify({
       name: scrapingUrl.name,
       rank,
       optionRate,
       items,
     }))
-
-    console.log('\x1b[36m%s\x1b[0m', `${path}/${scrapingUrl.name}.json`.padEnd(pad, ' ') + '✅');
   })
 }
 

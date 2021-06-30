@@ -1,4 +1,4 @@
-import { scraping, saveScraping } from "./utils"
+import { scraping, saveFile } from "./utils"
 import type c from "../../config/config"
 import fs from 'fs'
 
@@ -21,7 +21,7 @@ export default async function getScrapping(config: Config): Promise<void> {
   }
 
   for (const text in texts) {
-    saveScraping(`.bin/${paths[text]}.html`, texts[text])
+    saveFile(`.bin/${paths[text]}.html`, texts[text])
   }
 }
 

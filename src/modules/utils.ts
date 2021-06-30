@@ -23,7 +23,7 @@ export const scraping = async (url: string) => {
   return text
 }
 
-export const saveScraping = (path: string, text: string) => {
+export const saveFile = (path: string, text: string) => {
   try {
     const isFile = fs
       .lstatSync(path)
@@ -36,11 +36,8 @@ export const saveScraping = (path: string, text: string) => {
 
   }
 
-  fs.appendFile(path, text, { encoding: 'utf8' }, (error) => {
-    if (error) {
-      console.error('parse error, ', error)
-    }
-  })
+  fs.writeFileSync(path, text, { encoding: 'utf8' })
+  console.log('\x1b[36m%s\x1b[0m', `${path}`.padEnd(30, ' ') + ' ✅');
 }
 
 export const hasHTMLFiles = (config: Config): boolean => {
