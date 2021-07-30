@@ -72,14 +72,14 @@ test('Option rate test. ', () => {
     level: '120레벨 이상',
   })
 
-  expect(result.firstOptions).toStrictEqual([
+  expect(result.first).toStrictEqual([
     {
       name: '최대 HP : +100',
       rate: 5.8824,
     },    
   ])
 
-  expect(result.secondOptions).toStrictEqual([
+  expect(result.second).toStrictEqual([
     {
       name: 'STR : +6',
       rate: 7.2622,
@@ -94,7 +94,7 @@ test('Option rate test. ', () => {
     },
   ])
 
-  expect(result.thirdOptions).toStrictEqual([
+  expect(result.third).toStrictEqual([
     {
       name: 'STR : +6',
       rate: 7.2622,

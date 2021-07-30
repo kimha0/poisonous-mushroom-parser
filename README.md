@@ -56,15 +56,15 @@ type Data = {
       part: string // 해당 부위의 장비 이름
       level: string // 해당 레벨 이름
     }
-    firstOptions: {
+    first: {
       name: string // 옵션 이름
       rate: string // 옵션 등장 확률
     }[]
-    secondOptions: {
+    second: {
       name: string // 옵션 이름
       rate: string // 옵션 등장 확률
     }[]
-    thirdOptions: {
+    third: {
       name: string // 옵션 이름
       rate: string // 옵션 등장 확률
     }[]

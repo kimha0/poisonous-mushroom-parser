@@ -1,64 +1,53 @@
 import type { HTMLElement } from 'node-html-parser'
+import type { Option, Rate, ItemReturnType } from '../types/Item'
+import ParserInterface from '../types/ParserInterface'
 import { replaceName } from './modules/utils'
 
-type Option = {
-  name: string
-  part: string
-  level: string
-}
-
-type Rate = {
-  name: string
-  rate: number
-}
-
-export type ItemReturnType = {
-  option: Option
-  firstOptions: Rate[]
-  secondOptions: Rate[]
-  thirdOptions: Rate[]
-}
-export default class Item {
-  private option!: Option
-  private firstOptions!: Rate[]
-  private secondOptions!: Rate[]
-  private thirdOptions!: Rate[]
-
-  private cubeOptionEl!: HTMLElement
-  private cubeDataEl!: HTMLElement
+export default class Item implements ParserInterface<ItemReturnType> {
+  data!: ItemReturnType
 
 
 
-  constructor(cubeOptionEl: HTMLElement, cubeDataEl: HTMLElement) {
+  constructor(optionElement: HTMLElement, dataElement: HTMLElement) {
+    this.set(optionElement, dataElement)
+  }
 
-    this.cubeOptionEl = cubeOptionEl
-    this.cubeDataEl = cubeDataEl
+  get(): ItemReturnType {
+    return this.data
+  }
 
-    this.setCubeOption()
-    this.setCubeData()
+  set(optionElement: HTMLElement, dataElement: HTMLElement) {
+    const option = this.getOption(optionElement)
+    const [first, second, third] = this.setCubeData(dataElement)
+    this.data = {
+      option,
+      first,
+      second,
+      third,
+    }
   }
 
 
-  public setCubeOption() {
-    const liList = this.cubeOptionEl.querySelectorAll('ul li')
+  public getOption(optionElement: HTMLElement) {
+    const [nameText, partText, LevelText] = optionElement.querySelectorAll('ul li')
 
-    const name = liList[0].querySelector('span').text
-    const part = liList[1].querySelector('span').text
-    const level = liList[2].querySelector('span').text
+    const name = nameText.querySelector('span').text
+    const part = partText.querySelector('span').text
+    const level = LevelText.querySelector('span').text
 
-    this.option = {
+    return {
       name,
       part,
       level,
     }
   }
 
-  public setCubeData() {
+  private setCubeData(dataElement: HTMLElement) {
 
-    const thead = this.cubeDataEl.querySelectorAll('thead tr th')
-    const tbodyTableRows = this.cubeDataEl.querySelectorAll('tbody tr')
+    const title = dataElement.querySelectorAll('thead tr th')
+    const optionList = dataElement.querySelectorAll('tbody tr')
 
-    if (thead.length !== 6) {
+    if (title.length !== 6) {
       throw new TypeError('The number of headers in the cube data table does not match. can\'t parse')
     }
 
@@ -66,39 +55,29 @@ export default class Item {
     const secondOptions: Rate[] = []
     const thirdOptions: Rate[] = []
 
-    tbodyTableRows.forEach((rows) => {
-      const tbodyList = rows.querySelectorAll('td')
-      const firstName = replaceName(tbodyList[0].text)
-      const firstValue = tbodyList[1].text
-
-      const first = this.getRate(firstName, firstValue)
-
-      const secondName = replaceName(tbodyList[2].text)
-      const secondValue = tbodyList[3].text
-
-      const second = this.getRate(secondName, secondValue)
-
-      const thirdName = replaceName(tbodyList[4].text)
-      const thirdValue = tbodyList[5].text
-
-      const third = this.getRate(thirdName, thirdValue)
+    optionList.forEach((rows) => {
+      const option = rows.querySelectorAll('td')
       
-      if (first) {
-        firstOptions.push(first)
+      {
+        const [name, value] = option.slice(0, 2)
+        const options = this.getOptions(name, value)
+        if (options) firstOptions.push(options)
       }
 
-      if (second) {
-        secondOptions.push(second)
+      {
+        const [name, value] = option.slice(2, 4)
+        const options = this.getOptions(name, value)
+        if (options) secondOptions.push(options)
       }
 
-      if (third) {
-        thirdOptions.push(third)
+      {
+        const [name, value] = option.slice(4, 6)
+        const options = this.getOptions(name, value)
+        if (options) thirdOptions.push(options)
       }
     })
     
-    this.firstOptions = firstOptions
-    this.secondOptions = secondOptions
-    this.thirdOptions = thirdOptions
+    return [firstOptions, secondOptions, thirdOptions]
   }
 
   private getRate(name: string, value: string): Rate | null {
@@ -116,15 +95,10 @@ export default class Item {
 
   }
 
-
-
-  get(): ItemReturnType {
-    return {
-      option: this.option,
-      firstOptions: this.firstOptions,
-      secondOptions: this.secondOptions,
-      thirdOptions: this.thirdOptions,
-    }
+  private getOptions(nameElement: HTMLElement, valueElement: HTMLElement) {
+    const name = replaceName(nameElement.text)
+    const value = valueElement.text
+    const options = this.getRate(name, value)
+    return options
   }
-
 }

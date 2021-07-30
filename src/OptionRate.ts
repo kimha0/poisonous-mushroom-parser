@@ -1,33 +1,42 @@
 import type { HTMLElement } from 'node-html-parser'
+import type ParserInterface from '../types/ParserInterface'
+import type { OptionRateData, Rate } from '../types/OptionRate'
 
+export default class OptionRate implements ParserInterface<OptionRateData> {
 
-type Rate = { name: string, rate: number }
-export default class OptionRate {
-
-  private optionRates: {
-    name: string
-    first: Rate[]
-    second: Rate[] 
-    third: Rate[]
-  }[] = []
-
-  private html!: HTMLElement
-  private trList!: HTMLElement[]
-  private grades!: string[]
-
+  data: OptionRateData = []
   private static ROW_COUNTS = 3
 
 
   constructor(html: HTMLElement) {
-    this.html = html
-
-    this.setGrades()
-    this.setTRowList()
-    this.setOptionRates()
+    this.set(html)
   }
 
   get() {
-    return this.optionRates
+    return this.data
+  }
+
+  set(html: HTMLElement) {
+    const tableRows = this.getTableRows(html)
+    const grades = this.getGrades(html)
+
+    this.data = this.setOptionRates(tableRows, grades)
+  }
+  private getGrades(html: HTMLElement): string[] {
+    const thead = html.querySelectorAll('thead tr th')
+
+    if (thead.length === 0) {
+      throw new TypeError('th tag could not be found.')
+    }
+    
+    const grades = html.querySelectorAll('thead tr th').reduce<string[]>((accu, curr, currentIndex) => {
+      if (currentIndex === 0) { return accu }
+      
+      accu.push(curr.text)
+      return accu
+    }, [])
+
+    return grades
   }
 
   private getRates(rate: Rate[], current: number, rows: number, gradeCount: number): Rate[] {
@@ -40,34 +49,15 @@ export default class OptionRate {
     return newRate
   }
 
-  private setGrades() {
-    const thead = this.html.querySelectorAll('thead tr th')
-
-    if (thead.length === 0) {
-      throw new TypeError('th tag could not be found.')
-    }
-    
-    const grades = this.html.querySelectorAll('thead tr th').reduce<string[]>((accu, curr, currentIndex) => {
-      if (currentIndex === 0) { return accu }
-      
-      accu.push(curr.text)
-      return accu
-    }, [])
-
-    this.grades = grades
+  private getTableRows(html: HTMLElement) {
+    return html.querySelectorAll('tbody > tr')
   }
 
-  private setTRowList() {
-    this.trList = this.html.querySelectorAll('tbody > tr')
-  }
-
-  private setOptionRates() {
+  private setOptionRates(tableRows: HTMLElement[], grades: string[]) {
     let rowCounts = new Array<number>(OptionRate.ROW_COUNTS).fill(1)
     let optionIndex = 0
 
-    const [firstOptions, secondOptions, thirdOptions] = this.trList.reduce<
-      [Rate[], Rate[], Rate[]]
-    >((accu, curr) => {
+    const [firstOptions, secondOptions, thirdOptions] = tableRows.reduce<[Rate[], Rate[], Rate[]]>((accu, curr) => {
       if (curr.querySelector('th')?.hasAttribute('rowspan')) {
         optionIndex += 1
 
@@ -88,19 +78,13 @@ export default class OptionRate {
       return accu
 
     }, [[], [], []])
-    
-    const optionRates = this.grades.reduce<
-      {
-        name: string
-        first: Rate[]
-        second: Rate[] 
-        third: Rate[]
-      }[]
-    >((accu, curr, currentIndex) => {
 
-      const first: Rate[] = this.getRates(firstOptions, currentIndex, rowCounts[0], this.grades.length)
-      const second: Rate[] = this.getRates(secondOptions, currentIndex, rowCounts[1], this.grades.length)
-      const third: Rate[] = this.getRates(thirdOptions, currentIndex, rowCounts[2], this.grades.length)
+    const gradeLength = grades.length
+    
+    const optionRates = grades.reduce<OptionRateData>((accu, curr, currentIndex) => {
+      const first: Rate[] = this.getRates(firstOptions, currentIndex, rowCounts[0], gradeLength)
+      const second: Rate[] = this.getRates(secondOptions, currentIndex, rowCounts[1], gradeLength)
+      const third: Rate[] = this.getRates(thirdOptions, currentIndex, rowCounts[2], gradeLength)
 
       accu.push({
         name: curr,
@@ -111,8 +95,6 @@ export default class OptionRate {
       return accu
     }, [])
 
-    this.optionRates = optionRates
+    return optionRates
   }
-
-  
 }

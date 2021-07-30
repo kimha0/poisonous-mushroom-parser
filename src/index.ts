@@ -1,29 +1,25 @@
-import type c from "../config/config"
 import readline from 'readline'
 import getScrapping from "./modules/scrapping"
 import { hasHTMLFiles, mkdir, parseElement, parseElements, readText, saveFile } from "./modules/utils"
 import Rank from "./Rank"
 import OptionRate from "./OptionRate"
-import Item, { ItemReturnType } from "./Item"
-
-
-type Config = typeof c
+import Item from "./Item"
+import type { ItemReturnType } from '../types/Item'
+import config from '../config/config'
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-
 })
 
 async function main() {
   // 1. set html
   await settingHTML()
-  settingJSON()
   // 2. set JSON
+  settingJSON()
 }
 
 async function settingHTML() {
-  const config = require('../config/config').default as Config
 
   const downloadAnswer = await ask('Do you want to download a new HTML file you need? (Y/n): ')
   const shouldDownloadHtml = downloadAnswer === 'Y' || downloadAnswer === 'y'
@@ -50,7 +46,6 @@ async function ask(question: string): Promise<string> {
 }
 
 function settingJSON() {
-  const config = require('../config/config').default as Config
   const path = '.bin/json'
 
   mkdir(path)
