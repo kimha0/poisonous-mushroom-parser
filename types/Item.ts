@@ -9,7 +9,7 @@ export type Rate = {
   rate: number
 }
 
-export type ItemReturnType = {
+export type Items = {
   option: Option
   first: Rate[]
   second: Rate[]

@@ -1,4 +1,5 @@
 import fs from 'fs'
+import readline from 'readline'
 import type c from "../../config/config"
 import { parse } from 'node-html-parser'
 import fetch from 'node-fetch'
@@ -69,4 +70,19 @@ export const mkdir = (dirRoot: string) => {
 
 export const replaceName = (name: string) => {
   return name.replace(/[\r\n]+/g,'').replace(/[  ]+/g, ' ').trim()
+}
+
+export async function ask(question: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  })
+  
+  return await new Promise((resolve, reject) => {
+    rl.question(question, (input) => resolve(input))
+  })
+  .then(value => {
+    rl.close()
+    return value as string
+  })
 }

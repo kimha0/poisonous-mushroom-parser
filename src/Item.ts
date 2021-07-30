@@ -1,10 +1,10 @@
 import type { HTMLElement } from 'node-html-parser'
-import type { Option, Rate, ItemReturnType } from '../types/Item'
+import type { Rate, Items } from '../types/Item'
 import ParserInterface from '../types/ParserInterface'
 import { replaceName } from './modules/utils'
 
-export default class Item implements ParserInterface<ItemReturnType> {
-  data!: ItemReturnType
+export default class Item implements ParserInterface<Items> {
+  data!: Items
 
 
 
@@ -12,7 +12,7 @@ export default class Item implements ParserInterface<ItemReturnType> {
     this.set(optionElement, dataElement)
   }
 
-  get(): ItemReturnType {
+  get(): Items {
     return this.data
   }
 
